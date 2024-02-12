@@ -28,13 +28,22 @@ app.get('/', (request, response) => {
   response.send('Hello from backend!');
 });
 
-app.get('/api/persons', (request, response) => {
-  response.send(JSON.stringify(persons));
-});
-
 app.get('/info', (request, response) => {
   const output = `<p>Phonebook has info for ${persons.length} people.<br/>${(new Date()).toString()}</p>`;
   response.send(output);
+});
+
+app.get('/api/persons', (request, response) => {
+  response.json(persons);
+});
+
+app.get('/api/persons/:id', (request, response) => {
+  const id = +request.params.id;
+  const person = persons.find(person => person.id === id);
+  if (!person) {
+    return response.status(404).end();
+  }
+  response.json(person);
 });
 
 const PORT = 3001;
