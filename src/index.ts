@@ -1,7 +1,7 @@
 import express from 'express';
 const app = express();
 
-const persons = [
+let persons = [
   {
     id: 1,
     name: "Arto Hellas",
@@ -24,6 +24,12 @@ const persons = [
   }
 ];
 
+const getNextId = () => {
+  return Math.floor(Math.random() * 500) + 500;
+}
+
+app.use(express.json());
+
 app.get('/', (request, response) => {
   response.send('Hello from backend!');
 });
@@ -44,6 +50,36 @@ app.get('/api/persons/:id', (request, response) => {
     return response.status(404).end();
   }
   response.json(person);
+});
+
+app.post('/api/persons', (request, response) => {
+  // Currently rely on 'any' type for body value.
+  const { name, number } = request.body;
+  if (!name || !number) {
+    return response.status(400).json({
+      error: `Data is missing: ${!name ? 'name' : ''} ${!number ? 'number' : ''}`
+    });
+  }
+
+  if (persons.find(person => person.name === (name as string))) {
+    return response.status(400).json({
+      error: 'Person with such name has already added.'
+    });
+  }
+
+  const person = {
+    id: getNextId(),
+    name: name as string,
+    number: number as string,
+  };
+  persons.push(person);
+  response.json(person);
+});
+
+app.delete('/api/persons/:id', (request, response) => {
+  const id = +request.params.id;
+  persons = persons.filter(person => person.id !== id);
+  response.status(204).end();
 });
 
 const PORT = 3001;
