@@ -24,8 +24,17 @@ const persons = [
   }
 ];
 
+app.get('/', (request, response) => {
+  response.send('Hello from backend!');
+});
+
 app.get('/api/persons', (request, response) => {
   response.send(JSON.stringify(persons));
+});
+
+app.get('/info', (request, response) => {
+  const output = `<p>Phonebook has info for ${persons.length} people.<br/>${(new Date()).toString()}</p>`;
+  response.send(output);
 });
 
 const PORT = 3001;
