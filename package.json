@@ -6,7 +6,9 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:ui": "rm -rf dist && cd ../fullstack/part1/phonebook && npm run build && cp -r dist ../../../fullstack3",
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
   },
   "repository": {
     "type": "git",

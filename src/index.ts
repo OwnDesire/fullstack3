@@ -30,6 +30,7 @@ const getNextId = () => {
   return Math.floor(Math.random() * 500) + 500;
 }
 
+app.use(express.static('dist'));
 app.use(cors());
 app.use(express.json());
 app.use(morgan('tiny'));
