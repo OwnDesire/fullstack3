@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import morgan from 'morgan';
 const app = express();
 
@@ -29,6 +30,7 @@ const getNextId = () => {
   return Math.floor(Math.random() * 500) + 500;
 }
 
+app.use(cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 
@@ -84,5 +86,5 @@ app.delete('/api/persons/:id', (request, response) => {
   response.status(204).end();
 });
 
-const PORT = 3001;
+const PORT = process.env.POER || 3001;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
