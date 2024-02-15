@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import Person from './models/person';
@@ -10,24 +10,22 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 
-app.get('/', (request, response) => {
-  response.send('Hello from backend!');
-});
-
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons);
   });
 });
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
   Person.findById(request.params.id)
     .then(person => {
-      response.json(person);
+      if (person) {
+        response.json(person);
+      } else {
+        response.status(404).end();
+      }
     })
-    .catch(error => {
-      response.status(404).end();
-    })
+    .catch(error => next(error));
 
 });
 
@@ -40,12 +38,6 @@ app.post('/api/persons', (request, response) => {
     });
   }
 
-  // if (persons.find(person => person.name === (name as string))) {
-  //   return response.status(400).json({
-  //     error: 'Person with such name has already added.'
-  //   });
-  // }
-
   const person = new Person({
     name: name as string,
     number: number as string,
@@ -56,11 +48,24 @@ app.post('/api/persons', (request, response) => {
   })
 });
 
-// app.delete('/api/persons/:id', (request, response) => {
-//   const id = +request.params.id;
-//   persons = persons.filter(person => person.id !== id);
-//   response.status(204).end();
-// });
+app.delete('/api/persons/:id', (request, response, next) => {
+  Person.findByIdAndDelete(request.params.id)
+    .then(result => {
+      response.status(204).end();
+    })
+    .catch(error => next(error));
+});
+
+const errorHandler = (error: Error, request: Request, response: Response, next: NextFunction) => {
+  console.error(error.message);
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'Malformed id.' });
+  }
+
+  next(error);
+}
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
