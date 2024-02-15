@@ -6,6 +6,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
+    "mongo": "ts-node src/mongo.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cd ../fullstack/part1/phonebook && npm run build && cp -r dist ../../../fullstack3",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
@@ -27,11 +28,14 @@
   "homepage": "https://github.com/OwnDesire/fullstack3#readme",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.18.2"
+    "dotenv": "^16.4.4",
+    "express": "^4.18.2",
+    "mongoose": "^8.1.2"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.17",
     "morgan": "^1.10.0",
