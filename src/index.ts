@@ -10,6 +10,14 @@ app.use(cors());
 app.use(express.json());
 app.use(morgan('tiny'));
 
+app.get('/info', (request, response) => {
+  Person.countDocuments({}, { hint: '_id_' })
+    .then(count => {
+      const output = `<p>Phonebook has info for ${count} people.<br/>${(new Date()).toString()}</p>`;
+      response.send(output);
+    });
+});
+
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons);
@@ -29,13 +37,11 @@ app.get('/api/persons/:id', (request, response, next) => {
 
 });
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
   // Currently rely on 'any' type for body value.
   const { name, number } = request.body;
   if (!name || !number) {
-    return response.status(400).json({
-      error: `Data is missing: ${!name ? 'name' : ''} ${!number ? 'number' : ''}`
-    });
+    next(`Data is missing: ${!name ? 'name' : ''} ${!number ? 'number' : ''}`);
   }
 
   const person = new Person({
@@ -46,6 +52,24 @@ app.post('/api/persons', (request, response) => {
   person.save().then(savedPerson => {
     response.json(savedPerson);
   })
+});
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const { name, number } = request.body;
+  const person = {
+    name: name,
+    number: number
+  };
+
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then(updatedPerson => {
+      if (updatedPerson) {
+        response.json(updatedPerson);
+      } else {
+        response.status(404).end();
+      }
+    })
+    .catch(error => next(error))
 });
 
 app.delete('/api/persons/:id', (request, response, next) => {
