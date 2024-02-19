@@ -40,28 +40,31 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.post('/api/persons', (request, response, next) => {
   // Currently rely on 'any' type for body value.
   const { name, number } = request.body;
-  if (!name || !number) {
-    next(`Data is missing: ${!name ? 'name' : ''} ${!number ? 'number' : ''}`);
-  }
-
   const person = new Person({
     name: name as string,
     number: number as string,
   });
 
-  person.save().then(savedPerson => {
-    response.json(savedPerson);
-  })
+  person.save()
+    .then(savedPerson => {
+      response.json(savedPerson);
+    })
+    .catch(error => next(error));
 });
 
 app.put('/api/persons/:id', (request, response, next) => {
+  // Currently rely on 'any' type for body value.
   const { name, number } = request.body;
   const person = {
-    name: name,
-    number: number
+    name: name as string,
+    number: number as string
   };
 
-  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+  Person.findByIdAndUpdate(
+    request.params.id,
+    person,
+    { new: true, runValidators: true, context: 'query' }
+  )
     .then(updatedPerson => {
       if (updatedPerson) {
         response.json(updatedPerson);
@@ -84,6 +87,8 @@ const errorHandler = (error: Error, request: Request, response: Response, next: 
   console.error(error.message);
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'Malformed id.' });
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
