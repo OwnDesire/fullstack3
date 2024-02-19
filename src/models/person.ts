@@ -25,7 +25,7 @@ const personSchema = new mongoose.Schema<IPerson>({
   number: {
     type: String,
     validate: {
-      validator: (v: string) => /(\d{2,3}-\d+){8,}/.test(v),
+      validator: (v: string) => /\d{2,3}-\d{5,}/.test(v),
       message: props => `${props.value} has invalid number format.`,
       type: 'InvalidNumber'
     },
