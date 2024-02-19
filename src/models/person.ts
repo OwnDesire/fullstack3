@@ -9,9 +9,14 @@ mongoose.connect(url)
   })
   .catch(error => {
     console.log('error connecting to MongoDB', error);
-  })
+  });
 
-const personSchema = new mongoose.Schema({
+interface IPerson {
+  name: string,
+  number: string
+}
+
+const personSchema = new mongoose.Schema<IPerson>({
   name: {
     type: String,
     minLength: 3,
@@ -19,6 +24,11 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
+    validate: {
+      validator: (v: string) => /(\d{2,3}-\d+){8,}/.test(v),
+      message: props => `${props.value} has invalid number format.`,
+      type: 'InvalidNumber'
+    },
     required: true
   }
 });
@@ -31,4 +41,4 @@ personSchema.set('toJSON', {
   }
 });
 
-export default mongoose.model('Person', personSchema);
+export default mongoose.model<IPerson>('Person', personSchema);
