@@ -72,7 +72,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         response.status(404).end();
       }
     })
-    .catch(error => next(error))
+    .catch(error => next(error));
 });
 
 app.delete('/api/persons/:id', (request, response, next) => {
@@ -94,7 +94,7 @@ const errorHandler = (error: Error, request: Request, response: Response, next: 
   }
 
   next(error);
-}
+};
 
 app.use(errorHandler);
 
