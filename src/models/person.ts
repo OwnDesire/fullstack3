@@ -1,16 +1,5 @@
 import mongoose from 'mongoose';
 
-const url = process.env.MONGODB_URI!;
-console.log('connection to', url);
-mongoose.set('strictQuery', false);
-mongoose.connect(url)
-  .then(result => {
-    console.log('Connected to MongoDB');
-  })
-  .catch(error => {
-    console.log('error connecting to MongoDB', error);
-  });
-
 interface IPerson {
   name: string,
   number: string
